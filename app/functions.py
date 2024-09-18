@@ -6,17 +6,17 @@ from rich import print as rprint
 
 from app.classes import NodeClass
 from app.exceptions import ValidationException
-from app.strategies import find_node, add_node_to_tree
+from app.strategies import find_node, add_node_to_tree, get_node
 
 
-def clear(nodes):
+def clear(nodes, root_node=None):
     os.system('cls' if os.name == 'nt' else 'clear')
     if nodes:
-        root_node = {node for node in nodes if node.id == 1}.pop()
+        root_node = root_node or {node for node in nodes if node.id == 1}.pop()
         display_tree_from_node(root_node)
 
 def display_tree_from_node(root_node: NodeClass):
-    tree = Tree("[bold green]Family Tree", guide_style="bold bright_blue")
+    tree = Tree("[green]Family Tree", guide_style="bright_blue")
     add_node_to_tree(root_node, tree)
     rprint(tree)
 
@@ -31,7 +31,7 @@ def add_root(nodes: set) -> NodeClass:
 
     name = input("Name: ")
     node = NodeClass(name=name, identifier=1)
-    Console(style="bold green").print(f"Added {node}!")
+    Console(style="green").print(f"Added {node}!")
 
     return node
 
@@ -43,14 +43,15 @@ def add_node(nodes: set) -> NodeClass:
     name = input("Name: ")
     print("1: Is child of")
     print("2: Is spouse of")
-    relationship = input("Relationship: ")
+    print("3: Is sibling of")
+    relationship = input("Relation to (use ID): ")
 
     root_node = {node for node in nodes if node.id == 1}.pop()
 
     display_tree_from_node(root_node)
 
     relation_id = input("Select person ID: ")
-    relation_node, _ = find_node(root_node, int(relation_id), set())
+    relation_node, _ = get_node(nodes, int(relation_id))
     if not relation_node:
         raise ValidationException("Relationship does not exist")
 
@@ -60,8 +61,10 @@ def add_node(nodes: set) -> NodeClass:
             node.add_parent(parent=relation_node)
         case "2":
             node.add_spouse(spouse=relation_node)
+        case "3":
+            node.add_sibling(sibling=relation_node)
 
-    Console(style="bold green").print(f"Added {node}!")
+    Console(style="green").print(f"Added {node}!")
     return node
 
 
@@ -87,16 +90,16 @@ def add_person(nodes: set):
         return None
 
 
-def get_info(root_node: NodeClass,identifier: int):
-    person, _ = find_node(root_node, int(identifier), set())
-    rprint(f"[bold]Name: {person}")
+def get_info(nodes: set,identifier: int):
+    person, _ = get_node(nodes, int(identifier))
+    rprint(f"Name: {person}")
     if person.parent:
-        rprint(f"[bold]Parent: {person.parent}")
+        rprint(f"Parent: {person.parent}")
     if person.children:
-        rprint("[bold]Children")
+        rprint("Children")
         for child in person.children:
             rprint(f"  -: {child}")
     if person.siblings:
-        rprint("[bold]Siblings")
+        rprint("Siblings")
         for sibling in person.siblings:
             rprint(f"  -: {sibling}")

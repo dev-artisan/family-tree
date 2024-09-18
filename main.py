@@ -2,6 +2,7 @@ from rich.console import Console
 
 from app.classes import NodeClass
 from app.functions import clear, add_person, get_info
+from app.strategies import get_node
 
 nodes = set()
 
@@ -18,7 +19,7 @@ def load_data():
     junayd.add_parent(omar)
     junayd.add_spouse(jwife)
     fatima.add_parent(junayd)
-    muhammad.add_parent(junayd)
+    muhammad.add_sibling(fatima)
 
     nodes = {
         omar, khadijah, junayd, jwife, muhammad, fatima
@@ -33,7 +34,8 @@ def main():
             print("Options:")
             print("1: Add person")
             print("2: Get person info")
-            print("3: Exit")
+            print("3: Show tree with different root")
+            print("4: Exit")
 
             option = input("Please select an option: ")
             clear(nodes)
@@ -45,9 +47,13 @@ def main():
                         clear(nodes)
                 case "2":
                     if nodes:
-                        root_node = {node for node in nodes if node.id == 1}.pop()
-                        relation_id = input("Selet person ID: ")
-                        get_info(root_node, int(relation_id))
+                        relation_id = input("Select person ID: ")
+                        get_info(nodes, int(relation_id))
+
+                case "3":
+                    if nodes:
+                        relation_id = input("Select person ID: ")
+                        clear(nodes, root_node=get_node(nodes, int(relation_id)))
 
                 case _:
                     Console(style="bold red").print("Quitting!")

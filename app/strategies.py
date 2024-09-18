@@ -11,9 +11,13 @@ def traverse_nodes(root_node: NodeClass, fn: Callable):
 
 
 def add_node_to_tree(root_node: NodeClass, tree: Tree):
-    new_node = tree.add(f"{root_node}", guide_style="bold bright_blue")
+    new_node = tree.add(f"{root_node}", guide_style="bright_blue")
     for child_node in root_node.children:
         add_node_to_tree(child_node, new_node)
+
+
+def get_node(nodes: set, relation_id: int):
+    return {node for node in nodes if node.id == relation_id}.pop()
 
 
 def find_node(root_node: NodeClass, relation_id: int, traversed: set) -> tuple[NodeClass | None, set]:
@@ -41,5 +45,3 @@ def find_node(root_node: NodeClass, relation_id: int, traversed: set) -> tuple[N
                 break
 
     return return_node, traversed
-
-

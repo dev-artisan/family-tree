@@ -27,18 +27,23 @@ class NodeClass:
         return f"{self.name}"
 
     def add_sibling(self, sibling: Self) -> Self:
-        self.siblings = self.siblings.union({sibling})
-        sibling.siblings = sibling.siblings.union({sibling})
+        self.siblings = self.siblings.union({self, sibling})
+        sibling.siblings = sibling.siblings.union(self.siblings)
 
-        sibling.parent = self.parent
-
+        sibling.parent = self.parent or sibling.parent
         if sibling.parent:
+            self.parent = sibling.parent
+            self.parent.children = self.parent.children.union(self.siblings)
+
             for child in sibling.parent.children:
                 child.siblings = child.siblings.union(sibling.siblings)
 
         return sibling
 
     def add_spouse(self, spouse: Self) -> Self:
+        if self.spouse:
+            self.spouse.spouse = None
+
         self.spouse = spouse
         spouse.spouse = self
         return spouse
