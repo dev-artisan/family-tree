@@ -9,13 +9,6 @@ def traverse_nodes(root_node: NodeClass, fn: Callable):
     for child_node in root_node.children:
         traverse_nodes(child_node, fn)
 
-
-def add_node_to_tree(root_node: NodeClass, tree: Tree):
-    new_node = tree.add(f"{root_node}", guide_style="bright_blue")
-    for child_node in root_node.children:
-        add_node_to_tree(child_node, new_node)
-
-
 def get_node(nodes: set, relation_id: int):
     return {node for node in nodes if node.id == relation_id}.pop()
 

@@ -6,24 +6,39 @@ from rich import print as rprint
 
 from app.classes import NodeClass
 from app.exceptions import ValidationException
-from app.strategies import find_node, add_node_to_tree, get_node
+from app.strategies import get_node
 
 
 def clear(nodes, root_node=None):
     os.system('cls' if os.name == 'nt' else 'clear')
     if nodes:
-        root_node = root_node or {node for node in nodes if node.id == 1}.pop()
-        display_tree_from_node(root_node)
+        display_tree_from_node(nodes, root_node=root_node)
 
-def display_tree_from_node(root_node: NodeClass):
+
+def add_node_to_tree(root_node: NodeClass, tree: Tree, nodes_added: set):
+    nodes_added = nodes_added.union({root_node})
+    new_node = tree.add(f"{root_node}")
+    for child_node in root_node.children:
+        nodes_added = nodes_added.union(add_node_to_tree(child_node, new_node, nodes_added))
+    return nodes_added
+
+def display_tree_from_node(nodes: set, root_node: NodeClass = None):
+    if root_node is None:
+        root_node = {node for node in nodes if node.id == 1}.pop()
+
     tree = Tree("[green]Family Tree", guide_style="bright_blue")
-    add_node_to_tree(root_node, tree)
+    nodes_added = add_node_to_tree(root_node, tree, set())
     rprint(tree)
+    remaining_nodes = nodes.difference(nodes_added)
+    Console(style="blue").print("Other People not displayed:")
+    for node in remaining_nodes:
+        Console(style="blue").print(f"\t{node}")
 
 
 def get_identifiers(nodes: set) -> set:
     identifiers = {node.id for node in nodes}
     return identifiers
+
 
 def add_root(nodes: set) -> NodeClass:
     if len({node for node in nodes if node.id == 1}):
@@ -46,12 +61,10 @@ def add_node(nodes: set) -> NodeClass:
     print("3: Is sibling of")
     relationship = input("Relation to (use ID): ")
 
-    root_node = {node for node in nodes if node.id == 1}.pop()
-
-    display_tree_from_node(root_node)
+    display_tree_from_node(nodes)
 
     relation_id = input("Select person ID: ")
-    relation_node, _ = get_node(nodes, int(relation_id))
+    relation_node = get_node(nodes, int(relation_id))
     if not relation_node:
         raise ValidationException("Relationship does not exist")
 
@@ -90,8 +103,8 @@ def add_person(nodes: set):
         return None
 
 
-def get_info(nodes: set,identifier: int):
-    person, _ = get_node(nodes, int(identifier))
+def get_info(nodes: set, identifier: int):
+    person = get_node(nodes, int(identifier))
     rprint(f"Name: {person}")
     if person.parent:
         rprint(f"Parent: {person.parent}")
