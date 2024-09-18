@@ -6,7 +6,6 @@ from rich import print as rprint
 
 from app.classes import NodeClass
 from app.exceptions import ValidationException
-from app.strategies import get_node
 
 
 def clear(nodes, root_node=None):
@@ -15,12 +14,17 @@ def clear(nodes, root_node=None):
         display_tree_from_node(nodes, root_node=root_node)
 
 
-def add_node_to_tree(root_node: NodeClass, tree: Tree, nodes_added: set):
+def get_node(nodes: set, relation_id: int):
+    return {node for node in nodes if node.id == relation_id}.pop()
+
+
+def add_node_to_tree(root_node: NodeClass, tree: Tree, nodes_added: set) -> set:
     nodes_added = nodes_added.union({root_node})
     new_node = tree.add(f"{root_node}")
     for child_node in root_node.children:
         nodes_added = nodes_added.union(add_node_to_tree(child_node, new_node, nodes_added))
     return nodes_added
+
 
 def display_tree_from_node(nodes: set, root_node: NodeClass = None):
     if root_node is None:

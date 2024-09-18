@@ -1,16 +1,4 @@
-from rich.tree import Tree
-from typing import Callable
-
 from app.classes import NodeClass
-
-
-def traverse_nodes(root_node: NodeClass, fn: Callable):
-    fn(f"{root_node}")
-    for child_node in root_node.children:
-        traverse_nodes(child_node, fn)
-
-def get_node(nodes: set, relation_id: int):
-    return {node for node in nodes if node.id == relation_id}.pop()
 
 
 def find_node(root_node: NodeClass, relation_id: int, traversed: set) -> tuple[NodeClass | None, set]:
