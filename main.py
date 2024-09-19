@@ -3,7 +3,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from app.classes import NodeClass, application
-from app.functions import clear, add_person, get_info, get_node
+from app.functions import clear, add_person
 from app.strategies import CountStrategy, TraverseBreadthFirstStrategy, TraverseDepthFirstStrategy
 
 
@@ -69,30 +69,26 @@ def main():
 
             option = input("Please select an option: ")
             clear()
-            nodes = application.nodes
-
 
             match option:
                 case "1":
-                    node = add_person(nodes)
+                    node = add_person()
                     if node:
                         application.add_node(node)
                         clear()
                 case "2":
-                    if nodes:
-                        relation_id = input("Select person ID: ")
-                        get_info(nodes, int(relation_id))
+                    relation_id = input("Select person ID: ")
+                    application.get_info(int(relation_id))
 
                 case "3":
-                    if nodes:
-                        relation_id = input("Select person ID: ")
-                        clear(root_node=get_node(nodes, int(relation_id)))
+                    relation_id = input("Select person ID: ")
+                    clear(root_node=application.get_node(int(relation_id)))
                 case "4":
-                    if nodes:
+                    if application.nodes:
                         from_id = input("From person (ID): ")
                         to_id = input("To person (ID): ")
-                        from_node = get_node(nodes, int(from_id))
-                        to_node = get_node(nodes, int(to_id))
+                        from_node = application.get_node(int(from_id))
+                        to_node = application.get_node(int(to_id))
 
                         node = TraverseDepthFirstStrategy(
                             helper=CountStrategy()

@@ -16,10 +16,6 @@ def clear(root_node=None):
         display_tree_from_node(nodes, root_node=root_node)
 
 
-def get_node(nodes: set, relation_id: int):
-    return {node for node in nodes if node.id == relation_id}.pop()
-
-
 def add_node_to_tree(root_node: NodeClass, tree: Tree, nodes_added: set) -> set:
     nodes_added = nodes_added.union({root_node})
     new_node = tree.add(f"{root_node}")
@@ -70,7 +66,7 @@ def add_node(nodes: set) -> NodeClass:
     display_tree_from_node(nodes)
 
     relation_id = input("Select person ID: ")
-    relation_node = get_node(nodes, int(relation_id))
+    relation_node = application.get_node(int(relation_id))
     if not relation_node:
         raise ValidationException("Relationship does not exist")
 
@@ -87,13 +83,13 @@ def add_node(nodes: set) -> NodeClass:
     return node
 
 
-def add_person(nodes: set):
+def add_person():
     rprint(Panel(
         """1: Add root
 2: Add node
 3: Go back"""
     ))
-
+    nodes = application.nodes
     option = input("Select option: ")
     clear()
     try:
@@ -111,17 +107,3 @@ def add_person(nodes: set):
         Console(style="bold red").print(f"{e}")
         return None
 
-
-def get_info(nodes: set, identifier: int):
-    person = get_node(nodes, int(identifier))
-    rprint(f"Name: {person}")
-    if person.parent:
-        rprint(f"Parent: {person.parent}")
-    if person.children:
-        rprint("Children")
-        for child in person.children:
-            rprint(f"  -: {child}")
-    if person.siblings:
-        rprint("Siblings")
-        for sibling in person.siblings:
-            rprint(f"  -: {sibling}")
