@@ -28,15 +28,15 @@ class NodeClass:
 
     def add_sibling(self, sibling: Self) -> Self:
         self.siblings = self.siblings.union({self, sibling})
-        sibling.siblings = sibling.siblings.union(self.siblings)
+        self.siblings = self.siblings.union(sibling.siblings)
+
+        for other_sibling in self.siblings:
+            other_sibling.siblings = other_sibling.siblings.union(self.siblings)
 
         sibling.parent = self.parent or sibling.parent
         if sibling.parent:
             self.parent = sibling.parent
             self.parent.children = self.parent.children.union(self.siblings)
-
-            for child in sibling.parent.children:
-                child.siblings = child.siblings.union(sibling.siblings)
 
         return sibling
 

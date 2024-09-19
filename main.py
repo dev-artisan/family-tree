@@ -2,7 +2,7 @@ from rich.console import Console
 
 from app.classes import NodeClass
 from app.functions import clear, add_person, get_info, get_node
-from app.strategies import find_node
+from app.strategies import TraverseDepthFirstStrategy, CountStrategy, TraverseBreadthFirstStrategy
 
 nodes = set()
 
@@ -48,6 +48,7 @@ def load_data():
         hany,
         alia,
         abdullah,
+        marwan,
     }
 
 def main():
@@ -85,10 +86,23 @@ def main():
                         from_id = input("From person (ID): ")
                         to_id = input("To person (ID): ")
                         from_node = get_node(nodes, int(from_id))
-                        count = 0
-                        to_node, traversed = find_node(root_node=from_node, relation_id=int(to_id), traversed=set(), count=count)
-                        Console(style="bold yellow").print(f"{from_node.name} <--> {to_node.name}")
-                        Console(style="bold green").print(traversed)
+                        to_node = get_node(nodes, int(to_id))
+
+                        node = TraverseBreadthFirstStrategy(
+                            helper=CountStrategy()
+                        ).run(root_node=from_node, end_node=to_node)
+
+                        # if not node:
+                        #     node = TraverseBreadthFirstStrategy(
+                        #         helper=CountStrategy()
+                        #     ).run(root_node=to_node, end_node=from_node)
+                        # if not node:
+                        #     node = TraverseBreadthFirstStrategy(
+                        #         helper=CountStrategy()
+                        #     ).run(root_node=from_node, end_node=to_node)
+
+                        if not node:
+                            print("Person not found")
                 case _:
                     Console(style="bold red").print("Quitting!")
                     exit(1)
