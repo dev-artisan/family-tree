@@ -107,3 +107,47 @@ def add_person():
         Console(style="bold red").print(f"{e}")
         return None
 
+
+def load_data():
+    muhammad = NodeClass(name='Muhammad', identifier=1)
+    khadijah = NodeClass(name='Khadijah', identifier=2)
+    kareem = NodeClass(name='Kareem', identifier=3)
+    jasmine = NodeClass(name='Jasmine', identifier=4)
+    ahmad = NodeClass(name='Ahmad', identifier=5)
+    fatima = NodeClass(name='Fatima', identifier=6)
+    hoda = NodeClass(name='Hoda', identifier=7)
+    ridwan = NodeClass(name='Ridwan', identifier=8)
+    hany = NodeClass(name='Hany', identifier=9)
+    alia = NodeClass(name='Alia', identifier=10)
+    sharif = NodeClass(name='Sharif', identifier=11)
+    abdullah = NodeClass(name='Abdullah', identifier=12)
+    marwan = NodeClass(name='Marwan', identifier=13)
+
+    khadijah.add_spouse(muhammad)
+    kareem.add_parent(muhammad)
+    kareem.add_spouse(jasmine)
+    fatima.add_parent(kareem)
+    ahmad.add_sibling(fatima)
+    ridwan.add_parent(marwan)
+    fatima.add_spouse(hany)
+    alia.add_spouse(ridwan)
+    ridwan.add_sibling(hoda)
+    ridwan.add_sibling(sharif)
+    alia.add_sibling(abdullah)
+    marwan.add_parent(muhammad)
+
+    return {
+        muhammad,
+        khadijah,
+        kareem,
+        jasmine,
+        ahmad,
+        fatima,
+        hoda,
+        ridwan,
+        hany,
+        alia,
+        abdullah,
+        marwan,
+        sharif
+    }

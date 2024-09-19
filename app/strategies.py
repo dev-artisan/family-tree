@@ -1,5 +1,4 @@
 from queue import Queue, LifoQueue
-from typing import Protocol, Optional
 
 from rich.console import Console
 
@@ -11,7 +10,8 @@ class CountStrategy:
     traversed: LifoQueue[NodeClass]
 
     def __init__(self, **kwargs):
-        self.count = 0
+        # Init to -1 as we add the root node first so the distance should be 0 when adding the root
+        self.count = -1
         self.traversed = LifoQueue()
 
     def execute(self, **kwargs):
@@ -21,13 +21,11 @@ class CountStrategy:
         self.count += 1
 
     def print(self, **kwargs):
-        Console(style="bold green").print(f"Distance Count: {self.count - 1}")
+        Console(style="bold green").print(f"Distance Count: {self.count}")
         print_nodes = []
         while not self.traversed.empty():
             print_nodes.append(self.traversed.get().name)
-
-        Console(style="bold yellow").print(f"{' :left_right_arrow: '.join([node for node in reversed(print_nodes)])}")
-        # print(f"{' <--> '.join([node for node in reversed(nodes)])}")
+        # Console(style="bold yellow").print(f"{' :left_right_arrow: '.join([node for node in reversed(print_nodes)])}")
 
     def reverse(self, **kwargs):
         self.traversed.get()
@@ -86,20 +84,9 @@ class TraverseBreadthFirstStrategy:
         self.upward = upward
 
     def run(self, root_node: NodeClass, end_node: NodeClass):
-        node = None
         self.push_to_queue({root_node}, 0)
         self.helper.execute(node=root_node)
-        if self.upward:
-            current_node = root_node
-            while current_node.parent is not None:
-                current_node = current_node.parent
-                self.push_to_queue({current_node}, 0)
-                self.helper.execute(node=current_node)
-                node = self.find_node(end_node)
-                if node:
-                    break
-        else:
-            node = self.find_node(end_node)
+        node = self.find_node(end_node)
         if node:
             self.helper.print()
         return node
@@ -114,14 +101,18 @@ class TraverseBreadthFirstStrategy:
                 self.helper.reverse()
                 self.helper.execute(node=current_node)
 
-            if current_depth < prev_depth:
+            decrement = prev_depth - current_depth
+            while decrement > 0:
                 self.helper.reverse()
+                decrement -= 1
 
-            if current_depth > prev_depth:
+            decrement = current_depth - prev_depth
+            while decrement > 0:
                 self.helper.execute(node=current_node)
+                decrement -= 1
 
-            prev_depth = current_depth
             # print("GET", current_node.name, current_depth, prev_depth)
+            prev_depth = current_depth
 
             if current_node == end_node:
                 return current_node
@@ -131,6 +122,7 @@ class TraverseBreadthFirstStrategy:
         return return_node
 
     def push_to_queue(self, queue_nodes, current_depth):
+        print(self.traverse_queue.queue)
         for node in queue_nodes:
             if node not in self.traversed_set:
                 self.traversed_set.add(node)
