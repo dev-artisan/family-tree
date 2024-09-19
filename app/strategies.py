@@ -122,7 +122,7 @@ class TraverseBreadthFirstStrategy:
         return return_node
 
     def push_to_queue(self, queue_nodes, current_depth):
-        print(self.traverse_queue.queue)
+        # print(self.traverse_queue.queue)
         for node in queue_nodes:
             if node not in self.traversed_set:
                 self.traversed_set.add(node)
