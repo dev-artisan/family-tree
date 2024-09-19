@@ -1,6 +1,16 @@
 from typing import Self, Optional
 
 
+class App(object):
+    nodes: set
+    def __init__(self):
+        self.nodes = set()
+
+    def add_node(self, node):
+        self.nodes.add(node)
+
+application = App()
+
 class NodeClass:
     name: str
     id: int

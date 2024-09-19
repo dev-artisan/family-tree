@@ -1,13 +1,13 @@
+from rich import print as rprint
 from rich.console import Console
+from rich.panel import Panel
 
-from app.classes import NodeClass
+from app.classes import NodeClass, application
 from app.functions import clear, add_person, get_info, get_node
-from app.strategies import TraverseDepthFirstStrategy, CountStrategy, TraverseBreadthFirstStrategy
+from app.strategies import CountStrategy, TraverseBreadthFirstStrategy, TraverseDepthFirstStrategy
 
-nodes = set()
 
 def load_data():
-    global nodes
     muhammad = NodeClass(name='Muhammad', identifier=1)
     khadijah = NodeClass(name='Khadijah', identifier=2)
     kareem = NodeClass(name='Kareem', identifier=3)
@@ -35,8 +35,7 @@ def load_data():
     alia.add_sibling(abdullah)
     marwan.add_parent(muhammad)
 
-
-    nodes = {
+    application.nodes = {
         muhammad,
         khadijah,
         kareem,
@@ -49,29 +48,36 @@ def load_data():
         alia,
         abdullah,
         marwan,
+        sharif
     }
 
+
 def main():
-    global nodes
     load_data()
-    clear(nodes)
+    clear()
+
     try:
         while True:
-            print("Options:")
-            print("1: Add person")
-            print("2: Get person info")
-            print("3: Show tree with different root")
-            print("4: Calculate distance between people")
-            print("5: Exit")
+            rprint(Panel(
+    """[bold]Options:
+    1: Add person
+    2: Get person info
+    3: Show tree with different root
+    4: Calculate distance between people
+    5: Exit"""
+            ))
 
             option = input("Please select an option: ")
-            clear(nodes)
+            clear()
+            nodes = application.nodes
+
+
             match option:
                 case "1":
                     node = add_person(nodes)
                     if node:
-                        nodes = nodes.union({node})
-                        clear(nodes)
+                        application.add_node(node)
+                        clear()
                 case "2":
                     if nodes:
                         relation_id = input("Select person ID: ")
@@ -80,7 +86,7 @@ def main():
                 case "3":
                     if nodes:
                         relation_id = input("Select person ID: ")
-                        clear(nodes, root_node=get_node(nodes, int(relation_id)))
+                        clear(root_node=get_node(nodes, int(relation_id)))
                 case "4":
                     if nodes:
                         from_id = input("From person (ID): ")
@@ -88,21 +94,39 @@ def main():
                         from_node = get_node(nodes, int(from_id))
                         to_node = get_node(nodes, int(to_id))
 
-                        node = TraverseBreadthFirstStrategy(
+                        node = TraverseDepthFirstStrategy(
                             helper=CountStrategy()
                         ).run(root_node=from_node, end_node=to_node)
 
-                        # if not node:
-                        #     node = TraverseBreadthFirstStrategy(
-                        #         helper=CountStrategy()
-                        #     ).run(root_node=to_node, end_node=from_node)
-                        # if not node:
-                        #     node = TraverseBreadthFirstStrategy(
-                        #         helper=CountStrategy()
-                        #     ).run(root_node=from_node, end_node=to_node)
+                        if not node:
+                            node = TraverseDepthFirstStrategy(
+                                helper=CountStrategy()
+                            ).run(root_node=to_node, end_node=from_node)
 
                         if not node:
-                            print("Person not found")
+                            node = TraverseDepthFirstStrategy(
+                                helper=CountStrategy(),
+                                upward=True
+                            ).run(root_node=to_node, end_node=from_node)
+
+                        if not node:
+                            node = TraverseBreadthFirstStrategy(
+                                helper=CountStrategy()
+                            ).run(root_node=from_node, end_node=to_node)
+
+                        if not node:
+                            node = TraverseBreadthFirstStrategy(
+                                helper=CountStrategy()
+                            ).run(root_node=to_node, end_node=from_node)
+
+                        if not node:
+                            node = TraverseBreadthFirstStrategy(
+                                helper=CountStrategy(),
+                                upward=True
+                            ).run(root_node=to_node, end_node=from_node)
+
+                        if not node:
+                            Console(style="magenta").print("Person not found")
                 case _:
                     Console(style="bold red").print("Quitting!")
                     exit(1)

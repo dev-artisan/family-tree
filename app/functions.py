@@ -1,14 +1,16 @@
 import os
 
 from rich.console import Console
+from rich.panel import Panel
 from rich.tree import Tree
 from rich import print as rprint
 
-from app.classes import NodeClass
+from app.classes import NodeClass, application
 from app.exceptions import ValidationException
 
 
-def clear(nodes, root_node=None):
+def clear(root_node=None):
+    nodes = application.nodes
     os.system('cls' if os.name == 'nt' else 'clear')
     if nodes:
         display_tree_from_node(nodes, root_node=root_node)
@@ -86,11 +88,14 @@ def add_node(nodes: set) -> NodeClass:
 
 
 def add_person(nodes: set):
-    print("1: Add root")
-    print("2: Add node")
-    print("3: Go back")
+    rprint(Panel(
+        """1: Add root
+2: Add node
+3: Go back"""
+    ))
+
     option = input("Select option: ")
-    clear(nodes)
+    clear()
     try:
         match option:
             case "1":
