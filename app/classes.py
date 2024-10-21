@@ -1,9 +1,10 @@
-from typing import Self, Optional
+from typing import Optional, Self
 
 from rich import print as rprint
 
 
-class App(object):
+class App:
+    "This class represents the Singleton objects the Application uses for state management"
     nodes: set
 
     def __init__(self):
@@ -11,13 +12,13 @@ class App(object):
 
     def add_node(self, node):
         if not self.nodes:
-            return None
+            return
 
         self.nodes.add(node)
 
     def get_node(self, relation_id: int):
         if not self.nodes:
-            return
+            return None
         return {node for node in self.nodes if node.id == relation_id}.pop()
 
     def get_info(self, identifier: int):
@@ -41,6 +42,10 @@ application = App()
 
 
 class NodeClass:
+    """
+    This class represents a Node in the Family Tree, such as Parent, Chile or Sibling
+    """
+
     name: str
     id: int
     parent: Optional[Self]
@@ -59,7 +64,9 @@ class NodeClass:
     def __str__(self):
         string = f"[blue]{self.id}: {self.name}"
         if self.spouse:
-            string += f" ([magenta]spouse=[red]{self.spouse.id}: {self.spouse.name}[blue])"
+            string += (
+                f" ([magenta]spouse=[red]{self.spouse.id}: {self.spouse.name}[blue])"
+            )
         return string
 
     def __repr__(self):
