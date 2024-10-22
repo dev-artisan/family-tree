@@ -1,4 +1,4 @@
-from queue import Queue, LifoQueue
+from queue import LifoQueue, Queue
 
 from rich.console import Console
 
@@ -9,25 +9,24 @@ class CountStrategy:
     count: int
     traversed: LifoQueue[NodeClass]
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         # Init to -1 as we add the root node first so the distance should be 0 when adding the root
         self.count = -1
         self.traversed = LifoQueue()
 
     def execute(self, **kwargs):
-        node = kwargs.get('node')
+        node = kwargs.get("node")
         if node:
             self.traversed.put(node)
         self.count += 1
 
-    def print(self, **kwargs):
+    def print(self):
         Console(style="bold green").print(f"Distance Count: {self.count}")
         print_nodes = []
         while not self.traversed.empty():
             print_nodes.append(self.traversed.get().name)
-        # Console(style="bold yellow").print(f"{' :left_right_arrow: '.join([node for node in reversed(print_nodes)])}")
 
-    def reverse(self, **kwargs):
+    def reverse(self):
         self.traversed.get()
         self.count -= 1
 

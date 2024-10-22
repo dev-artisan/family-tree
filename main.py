@@ -3,8 +3,12 @@ from rich.console import Console
 from rich.panel import Panel
 
 from app.classes import application
-from app.functions import clear, add_person, load_data
-from app.strategies import CountStrategy, TraverseBreadthFirstStrategy, TraverseDepthFirstStrategy
+from app.functions import add_person, clear, load_data
+from app.strategies import (
+    CountStrategy,
+    TraverseBreadthFirstStrategy,
+    TraverseDepthFirstStrategy,
+)
 
 
 def main():
@@ -13,14 +17,16 @@ def main():
 
     try:
         while True:
-            rprint(Panel(
-        """[bold]Options:
+            rprint(
+                Panel(
+                    """[bold]Options:
         1: Add person
         2: Get person info
         3: Show tree with different root
         4: Calculate distance between people
         5: Exit"""
-            ))
+                )
+            )
 
             option = input("Please select an option: ")
             clear()
@@ -45,9 +51,15 @@ def main():
                         from_node = application.get_node(int(from_id))
                         to_node = application.get_node(int(to_id))
 
-                        node = TraverseDepthFirstStrategy(
-                            helper=CountStrategy()
-                        ).run(root_node=from_node, end_node=to_node)
+                        if not from_node or not to_node:
+                            Console(style="magenta").print(
+                                "Please select valid members"
+                            )
+                            return
+
+                        node = TraverseDepthFirstStrategy(helper=CountStrategy()).run(
+                            root_node=from_node, end_node=to_node
+                        )
 
                         if not node:
                             node = TraverseDepthFirstStrategy(
@@ -56,8 +68,7 @@ def main():
 
                         if not node:
                             node = TraverseDepthFirstStrategy(
-                                helper=CountStrategy(),
-                                upward=True
+                                helper=CountStrategy(), upward=True
                             ).run(root_node=to_node, end_node=from_node)
 
                         if not node:
@@ -72,8 +83,7 @@ def main():
 
                         if not node:
                             node = TraverseBreadthFirstStrategy(
-                                helper=CountStrategy(),
-                                upward=True
+                                helper=CountStrategy(), upward=True
                             ).run(root_node=to_node, end_node=from_node)
 
                         if not node:
@@ -87,5 +97,5 @@ def main():
         exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

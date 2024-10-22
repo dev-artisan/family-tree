@@ -3,48 +3,7 @@ from typing import Optional, Self
 from rich import print as rprint
 
 
-class App:
-    "This class represents the Singleton objects the Application uses for state management"
-    nodes: set
-
-    def __init__(self):
-        self.nodes = set()
-
-    def add_node(self, node):
-        if not self.nodes:
-            return
-
-        self.nodes.add(node)
-
-    def get_node(self, relation_id: int):
-        if not self.nodes:
-            return None
-        return {node for node in self.nodes if node.id == relation_id}.pop()
-
-    def get_info(self, identifier: int):
-        person = self.get_node(int(identifier))
-        if not person:
-            return
-        rprint(f"Name: {person}")
-        if person.parent:
-            rprint(f"Parent: {person.parent}")
-        if person.children:
-            rprint("Children")
-            for child in person.children:
-                rprint(f"  -: {child}")
-        if person.siblings:
-            rprint("Siblings")
-            for sibling in person.siblings:
-                rprint(f"  -: {sibling}")
-
-
-application = App()
-
-
 class NodeClass:
-    """
-    This class represents a Node in the Family Tree, such as Parent, Chile or Sibling
-    """
 
     name: str
     id: int
@@ -102,3 +61,41 @@ class NodeClass:
             child.siblings = child.siblings.union({self})
 
         return parent
+
+
+class App:
+    "This class represents the Singleton objects the Application uses for state management"
+    nodes: set
+
+    def __init__(self):
+        self.nodes = set()
+
+    def add_node(self, node):
+        if not self.nodes:
+            return
+
+        self.nodes.add(node)
+
+    def get_node(self, relation_id: int) -> Optional[NodeClass]:
+        if not self.nodes:
+            return None
+        return {node for node in self.nodes if node.id == relation_id}.pop()
+
+    def get_info(self, identifier: int):
+        person = self.get_node(int(identifier))
+        if not person:
+            return
+        rprint(f"Name: {person}")
+        if person.parent:
+            rprint(f"Parent: {person.parent}")
+        if person.children:
+            rprint("Children")
+            for child in person.children:
+                rprint(f"  -: {child}")
+        if person.siblings:
+            rprint("Siblings")
+            for sibling in person.siblings:
+                rprint(f"  -: {sibling}")
+
+
+application = App()
