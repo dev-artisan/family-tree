@@ -1,30 +1,37 @@
 import os
 
+from app.classes import NodeClass, application
+from app.exceptions import ValidationException
+from app.strategies import (
+    CountStrategy,
+    TraverseBreadthFirstStrategy,
+    TraverseDepthFirstStrategy,
+)
+from rich import print as rprint
 from rich.console import Console
 from rich.panel import Panel
 from rich.tree import Tree
-from rich import print as rprint
-
-from app.classes import NodeClass, application
-from app.exceptions import ValidationException
 
 
 def clear(root_node=None):
     nodes = application.nodes
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system("cls" if os.name == "nt" else "clear")
     if nodes:
         display_tree_from_node(nodes, root_node=root_node)
 
 
-def add_node_to_tree(root_node: NodeClass, tree: Tree, nodes_added: set) -> set:
+def add_node_to_tree(root_node: NodeClass | None, tree: Tree, nodes_added: set) -> set:
     nodes_added = nodes_added.union({root_node})
     new_node = tree.add(f"{root_node}")
-    for child_node in root_node.children:
-        nodes_added = nodes_added.union(add_node_to_tree(child_node, new_node, nodes_added))
+    if root_node:
+        for child_node in root_node.children:
+            nodes_added = nodes_added.union(
+                add_node_to_tree(child_node, new_node, nodes_added)
+            )
     return nodes_added
 
 
-def display_tree_from_node(nodes: set, root_node: NodeClass = None):
+def display_tree_from_node(nodes: set, root_node: NodeClass | None = None):
     if root_node is None:
         root_node = {node for node in nodes if node.id == 1}.pop()
 
@@ -84,11 +91,13 @@ def add_node(nodes: set) -> NodeClass:
 
 
 def add_person():
-    rprint(Panel(
-        """1: Add root
+    rprint(
+        Panel(
+            """1: Add root
 2: Add node
 3: Go back"""
-    ))
+        )
+    )
     nodes = application.nodes
     option = input("Select option: ")
     clear()
@@ -108,20 +117,95 @@ def add_person():
         return None
 
 
+def menu():
+    rprint(
+        Panel(
+            """[bold]Options:
+        1: Add person
+        2: Get person info
+        3: Show tree with different root
+        4: Calculate distance between people
+        5: Exit"""
+        )
+    )
+
+    option = input("Please select an option: ")
+    clear()
+
+    match option:
+        case "1":
+            node = add_person()
+            if node:
+                application.add_node(node)
+                clear()
+        case "2":
+            relation_id = input("Select person ID: ")
+            application.get_info(int(relation_id))
+
+        case "3":
+            relation_id = input("Select person ID: ")
+            clear(root_node=application.get_node(int(relation_id)))
+        case "4":
+            if application.nodes:
+                from_id = input("From person (ID): ")
+                to_id = input("To person (ID): ")
+                from_node = application.get_node(int(from_id))
+                to_node = application.get_node(int(to_id))
+
+                if not from_node or not to_node:
+                    Console(style="magenta").print("Please select valid members")
+                    return
+
+                node = TraverseDepthFirstStrategy(helper=CountStrategy()).run(
+                    root_node=from_node, end_node=to_node
+                )
+
+                if not node:
+                    node = TraverseDepthFirstStrategy(helper=CountStrategy()).run(
+                        root_node=to_node, end_node=from_node
+                    )
+
+                if not node:
+                    node = TraverseDepthFirstStrategy(
+                        helper=CountStrategy(), upward=True
+                    ).run(root_node=to_node, end_node=from_node)
+
+                if not node:
+                    node = TraverseBreadthFirstStrategy(helper=CountStrategy()).run(
+                        root_node=from_node, end_node=to_node
+                    )
+
+                if not node:
+                    node = TraverseBreadthFirstStrategy(helper=CountStrategy()).run(
+                        root_node=to_node, end_node=from_node
+                    )
+
+                if not node:
+                    node = TraverseBreadthFirstStrategy(
+                        helper=CountStrategy(), upward=True
+                    ).run(root_node=to_node, end_node=from_node)
+
+                if not node:
+                    Console(style="magenta").print("Person not found")
+        case _:
+            Console(style="bold red").print("Quitting!")
+            exit(1)
+
+
 def load_data():
-    muhammad = NodeClass(name='Muhammad', identifier=1)
-    khadijah = NodeClass(name='Khadijah', identifier=2)
-    kareem = NodeClass(name='Kareem', identifier=3)
-    jasmine = NodeClass(name='Jasmine', identifier=4)
-    ahmad = NodeClass(name='Ahmad', identifier=5)
-    fatima = NodeClass(name='Fatima', identifier=6)
-    hoda = NodeClass(name='Hoda', identifier=7)
-    ridwan = NodeClass(name='Ridwan', identifier=8)
-    hany = NodeClass(name='Hany', identifier=9)
-    alia = NodeClass(name='Alia', identifier=10)
-    sharif = NodeClass(name='Sharif', identifier=11)
-    abdullah = NodeClass(name='Abdullah', identifier=12)
-    marwan = NodeClass(name='Marwan', identifier=13)
+    muhammad = NodeClass(name="Muhammad", identifier=1)
+    khadijah = NodeClass(name="Khadijah", identifier=2)
+    kareem = NodeClass(name="Kareem", identifier=3)
+    jasmine = NodeClass(name="Jasmine", identifier=4)
+    ahmad = NodeClass(name="Ahmad", identifier=5)
+    fatima = NodeClass(name="Fatima", identifier=6)
+    hoda = NodeClass(name="Hoda", identifier=7)
+    ridwan = NodeClass(name="Ridwan", identifier=8)
+    hany = NodeClass(name="Hany", identifier=9)
+    alia = NodeClass(name="Alia", identifier=10)
+    sharif = NodeClass(name="Sharif", identifier=11)
+    abdullah = NodeClass(name="Abdullah", identifier=12)
+    marwan = NodeClass(name="Marwan", identifier=13)
 
     khadijah.add_spouse(muhammad)
     kareem.add_parent(muhammad)
@@ -149,5 +233,6 @@ def load_data():
         alia,
         abdullah,
         marwan,
-        sharif
+        sharif,
     }
+
