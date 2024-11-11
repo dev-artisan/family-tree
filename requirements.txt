@@ -3,3 +3,7 @@ pytest
 
 # App dependencies
 rich
+neomodel
+neo4j
+python-dotenv
+

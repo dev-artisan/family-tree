@@ -64,7 +64,10 @@ class NodeClass:
 
 
 class App:
-    "This class represents the Singleton objects the Application uses for state management"
+    """
+    This class represents the Singleton objects the Application uses for state management
+    """
+
     nodes: set
 
     def __init__(self):

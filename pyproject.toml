@@ -1,0 +1,17 @@
+[project]
+name = "family-tree"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "neo4j>=5.26.0",
+    "neomodel>=5.4.0",
+    "python-dotenv>=1.0.1",
+    "rich>=13.9.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.3",
+]
